@@ -4,8 +4,8 @@ import com.mediaapp.model.SearchHistory;
 import com.mediaapp.model.User;
 import com.mediaapp.repository.SearchHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -22,6 +22,7 @@ public class MediaService {
     @Autowired
     private SearchHistoryRepository searchHistoryRepository;
 
+    @Transactional  // Add this
     public Map<String, Object> searchMedia(String query, String mediaType, String license, String source, int page, User user) {
         StringBuilder apiUrl = new StringBuilder(OPENVERSE_API_BASE_URL + "?q=" + query + "&page=" + page);
 
@@ -84,7 +85,6 @@ public class MediaService {
             );
 
         } catch (Exception e) {
-            // Return error with specific message for debugging
             return Map.of("error", "Error fetching media: " + e.getMessage());
         }
     }

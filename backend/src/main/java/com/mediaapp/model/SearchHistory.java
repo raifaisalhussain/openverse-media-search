@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Table(name = "search_history")
 @Getter
 @Setter
-@NoArgsConstructor  // ✅ Helpful if you ever need a no-arg constructor explicitly
+@NoArgsConstructor
 public class SearchHistory {
 
     @Id
@@ -27,7 +27,6 @@ public class SearchHistory {
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    // Optional: Add constructor for easy testing or creation
     public SearchHistory(User user, String searchQuery) {
         this.user = user;
         this.searchQuery = searchQuery;

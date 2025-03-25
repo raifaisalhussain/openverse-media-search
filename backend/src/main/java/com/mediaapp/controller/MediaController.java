@@ -23,7 +23,7 @@ public class MediaController {
             @RequestParam(required = false) String license,
             @RequestParam(required = false) String source,
             @RequestParam(defaultValue = "1") int page,
-            @AuthenticationPrincipal User user // ✅ Authenticated User (optional)
+            @AuthenticationPrincipal User user
     ) {
         try {
             Map<String, Object> response = mediaService.searchMedia(query, mediaType, license, source, page, user);
