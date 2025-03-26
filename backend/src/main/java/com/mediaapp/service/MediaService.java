@@ -3,6 +3,8 @@ package com.mediaapp.service;
 import com.mediaapp.model.SearchHistory;
 import com.mediaapp.model.User;
 import com.mediaapp.repository.SearchHistoryRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +15,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class MediaService {
+
+
+    private static final Logger logger = LoggerFactory.getLogger(MediaService.class);
 
     private final String OPENVERSE_API_BASE_URL = "https://api.openverse.org/v1/images/";
 
@@ -58,10 +63,13 @@ public class MediaService {
 
             // Save Search Query if User is Authenticated
             if (user != null) {
+                logger.info("Saving search history for user: {}", user.getUsername());
                 SearchHistory history = new SearchHistory();
                 history.setUser(user);
                 history.setSearchQuery(query);
                 searchHistoryRepository.save(history);
+            }else {
+                logger.warn("User is null. Search history not saved.");
             }
 
             // Pagination Logic

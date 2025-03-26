@@ -1,10 +1,12 @@
 package com.mediaapp.controller;
 
 import com.mediaapp.model.User;
+import com.mediaapp.repository.UserRepository;
 import com.mediaapp.service.MediaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -16,6 +18,9 @@ public class MediaController {
     @Autowired
     private MediaService mediaService;
 
+    @Autowired
+    private UserRepository userRepository;  // ✅ Add this to fetch User from DB
+
     @GetMapping("/search")
     public ResponseEntity<?> searchMedia(
             @RequestParam String query,
@@ -23,13 +28,14 @@ public class MediaController {
             @RequestParam(required = false) String license,
             @RequestParam(required = false) String source,
             @RequestParam(defaultValue = "1") int page,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserDetails userDetails  // ✅ Use UserDetails
     ) {
-        try {
-            Map<String, Object> response = mediaService.searchMedia(query, mediaType, license, source, page, user);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("error", "Error fetching media: " + e.getMessage()));
+        User user = null;
+        if (userDetails != null) {
+            user = userRepository.findByUsername(userDetails.getUsername()).orElse(null);  // ✅ Fetch actual User from DB
         }
+
+        Map<String, Object> response = mediaService.searchMedia(query, mediaType, license, source, page, user);
+        return ResponseEntity.ok(response);
     }
 }
