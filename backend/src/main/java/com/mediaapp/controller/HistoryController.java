@@ -1,5 +1,6 @@
 package com.mediaapp.controller;
 
+import com.mediaapp.exception.UserNotFoundException;
 import com.mediaapp.model.SearchHistory;
 import com.mediaapp.service.SearchHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,18 @@ public class HistoryController {
     @Autowired
     private SearchHistoryService historyService;
 
-    // ✅ Get search history for a specific user
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<SearchHistory>> getUserHistory(@PathVariable Long userId) {
-        return ResponseEntity.ok(historyService.getUserHistory(userId));
+    // ✅ Get search history for a specific user BY USERNAME
+    @GetMapping("/user/{username}")
+    public ResponseEntity<List<SearchHistory>> getUserHistory(@PathVariable String username) {
+        // calls a new service method that finds user by username, then fetches search history by userId
+        List<SearchHistory> history = historyService.getUserHistoryByUsername(username);
+        if (history == null) {
+            throw new UserNotFoundException("User not found: " + username);
+        }
+        return ResponseEntity.ok(history);
     }
 
-    // ✅ Save a new search query
+    // ✅ Save a new search query (still uses numeric userId)
     @PostMapping("/save")
     public ResponseEntity<?> saveSearch(@RequestParam Long userId, @RequestParam String query) {
         historyService.saveSearch(userId, query);

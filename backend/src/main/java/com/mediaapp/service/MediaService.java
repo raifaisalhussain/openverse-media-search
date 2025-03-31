@@ -36,14 +36,19 @@ public class MediaService {
         if (source != null) apiUrl.append("&source=").append(source);
 
         try {
-            // API call with simple GET, can add headers if needed
+            logger.info("Calling Openverse: {}", apiUrl);
             Map<String, Object> apiResponse = restTemplate.getForObject(apiUrl.toString(), Map.class);
 
-            if (apiResponse == null || !apiResponse.containsKey("results")) {
-                return Map.of("error", "No results found");
+            if (apiResponse == null) {
+                return Map.of("error", "No response from Openverse");
             }
 
-            List<Map<String, Object>> results = (List<Map<String, Object>>) apiResponse.get("results");
+            Object rawResults = apiResponse.get("results");
+            if (!(rawResults instanceof List)) {
+                return Map.of("error", "Unexpected API format: 'results' missing or invalid");
+            }
+
+            List<Map<String, Object>> results = (List<Map<String, Object>>) rawResults;
 
             List<Map<String, Object>> formattedResults = results.stream().map(result -> {
                 Map<String, Object> formatted = new HashMap<>();
@@ -68,14 +73,18 @@ public class MediaService {
                 history.setUser(user);
                 history.setSearchQuery(query);
                 searchHistoryRepository.save(history);
-            }else {
+            } else {
                 logger.warn("User is null. Search history not saved.");
             }
 
-            // Pagination Logic
-            int totalResults = (int) apiResponse.getOrDefault("result_count", 0);
-            int pageSize = (int) apiResponse.getOrDefault("page_size", 20);
+            // Pagination Logic with safe null handling
+            Number totalResultsNum = (Number) apiResponse.get("result_count");
+            Number pageSizeNum = (Number) apiResponse.get("page_size");
+
+            int totalResults = totalResultsNum != null ? totalResultsNum.intValue() : 0;
+            int pageSize = pageSizeNum != null ? pageSizeNum.intValue() : 20;
             int totalPages = (totalResults + pageSize - 1) / pageSize;
+
 
             String nextPageUrl = (page < totalPages) ?
                     "http://localhost:8080/api/media/search?query=" + query + "&page=" + (page + 1) : null;
@@ -83,17 +92,27 @@ public class MediaService {
             String previousPageUrl = (page > 1) ?
                     "http://localhost:8080/api/media/search?query=" + query + "&page=" + (page - 1) : null;
 
-            return Map.of(
-                    "totalResults", totalResults,
-                    "pageSize", pageSize,
-                    "page", page,
-                    "nextPage", nextPageUrl,
-                    "previousPage", previousPageUrl,
-                    "media", formattedResults
-            );
+
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("totalResults", totalResults);
+            resultMap.put("pageSize", pageSize);
+            resultMap.put("page", page);
+            resultMap.put("nextPage", nextPageUrl);      // can be null, no crash
+            resultMap.put("previousPage", previousPageUrl); // can be null, no crash
+            resultMap.put("media", formattedResults);
+
+            return resultMap;
 
         } catch (Exception e) {
-            return Map.of("error", "Error fetching media: " + e.getMessage());
+            logger.error("Failed to fetch media from Openverse API", e);
+
+            String details = e.getMessage() != null ? e.getMessage() : "No details available";
+
+            return Map.of(
+                    "error", "Exception: " + e.getClass().getSimpleName(),
+                    "details", details
+            );
         }
+
     }
 }
