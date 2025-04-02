@@ -34,14 +34,17 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody User user) {
+    public ResponseEntity<?> login(@RequestBody User user) {
+        // 1) Attempt auth
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
         );
 
+        // 2) Build the token
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
-        String jwtToken = jwtUtil.generateToken(userDetails); // ✅ Fix: Now passing UserDetails
+        String jwt = jwtUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(jwtToken);
+        // 3) Return just the JWT (plain text or JSON)
+        return ResponseEntity.ok(jwt);
     }
 }

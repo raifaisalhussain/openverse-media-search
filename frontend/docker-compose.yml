@@ -1,32 +1,35 @@
-# docker-compose.yml
-
+version: '3.8'
 services:
-  frontend:
-    build: .
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-    environment:
-      - REACT_APP_API_BASE_URL=http://backend:8080
-
-  backend:
-    build: ../backend  # Path to your backend Dockerfile
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres/mediaapp
-    depends_on:
-      - postgres
-
   postgres:
     image: postgres:15
     environment:
-      - POSTGRES_USER=mediauser
-      - POSTGRES_PASSWORD=test123
-      - POSTGRES_DB=mediaapp
+      POSTGRES_USER: mediauser
+      POSTGRES_PASSWORD: test123
+      POSTGRES_DB: mediaapp
+    ports:
+      - '5432:5432'
     volumes:
       - postgres-data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    ports:
+      - '8080:8080'
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mediaapp
+      SPRING_DATASOURCE_USERNAME: mediauser
+      SPRING_DATASOURCE_PASSWORD: test123
+    depends_on:
+      - postgres
+
+  frontend:
+    build: ./frontend
+    ports:
+      - '3000:80'
+    environment:
+      REACT_APP_API_BASE_URL: http://backend:8080
+    depends_on:
+      - backend
 
 volumes:
   postgres-data:

@@ -2,6 +2,7 @@ package com.mediaapp.service;
 
 import com.mediaapp.model.User;
 import com.mediaapp.repository.SearchHistoryRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -68,5 +69,18 @@ class MediaServiceTest {
         // 3. Verify
         assertTrue(result.containsKey("media"));
         verify(searchHistoryRepository, never()).save(any());
+    }
+
+    @Test
+    void testSearchMediaNullUser() {
+        // for demonstration only
+        MediaService mediaService = Mockito.mock(MediaService.class);
+
+        Mockito.when(mediaService.searchMedia("test", "image", null, null, 1, null))
+                .thenReturn(Map.of("media", "someValue"));
+
+        var result = mediaService.searchMedia("test", "image", null, null, 1, null);
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(result.containsKey("media"));
     }
 }

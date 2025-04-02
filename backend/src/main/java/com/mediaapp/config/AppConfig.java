@@ -1,34 +1,48 @@
 package com.mediaapp.config;
 
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
-import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
+
+import jakarta.annotation.PostConstruct;
+import javax.net.ssl.*;
+import java.security.cert.X509Certificate;
 
 @Configuration
 public class AppConfig {
 
-    @Bean
-    public RestTemplate restTemplate() {
-        HttpClientConnectionManager poolingConnManager = PoolingHttpClientConnectionManagerBuilder.create()
-                .setMaxConnTotal(100)
-                .setMaxConnPerRoute(20)
-                .build();
+    /**
+     * Insecurely bypass SSL checks by overriding Java's default SSL context.
+     * DO NOT USE IN PRODUCTION.
+     */
+    @PostConstruct
+    public void disableSslVerification() throws Exception {
+        // 1) Create a naive TrustManager that trusts all certs
+        TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+                    public void checkClientTrusted(X509Certificate[] chain, String authType) {}
+                    public void checkServerTrusted(X509Certificate[] chain, String authType) {}
+                }
+        };
 
-        CloseableHttpClient httpClient = HttpClients.custom()
-                .setConnectionManager(poolingConnManager)
-                .build();
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
 
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
-        factory.setConnectTimeout(5000);
-        factory.setReadTimeout(5000);
+        // 2) Override default socket factory with our insecure context
+        HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
 
-        return new RestTemplate(factory);
+        // 3) Bypass hostname checks
+        HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
     }
 
-
+    /**
+     * Provide a simple RestTemplate.
+     * It uses Java's default SSL, which we already disabled in disableSslVerification().
+     */
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.build();
+    }
 }

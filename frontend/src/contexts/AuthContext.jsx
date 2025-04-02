@@ -1,52 +1,60 @@
 // src/contexts/AuthContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-import Cookies from 'js-cookie';
-import api from '../utils/http';
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
 
-    // Attempt to restore user from cookie at startup
     useEffect(() => {
-        const token = Cookies.get('token');
+        // ✅ Set the base URL for all axios calls
+        axios.defaults.baseURL = 'http://localhost:8080'; // <--- add this
+
+        const token = localStorage.getItem('token');
         if (token) {
             try {
                 const decoded = jwtDecode(token);
-                // Example: If your JWT has { sub: <userId>, username: ... }
-                setUser({ id: decoded.sub, username: decoded.username });
-            } catch {
-                Cookies.remove('token');
+                setUser({ username: decoded.sub });
+
+                // ✅ Set global default Authorization header
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            } catch (err) {
+                console.error("Invalid token:", err);
+                logout();
             }
         }
     }, []);
 
-    const login = async (credentials) => {
-        // The backend returns a raw JWT string
-        const { data: token } = await api.post('/api/auth/login', credentials);
-        // Store token in cookies
-        Cookies.set('token', token);
+    async function login(credentials) {
+        // Because we set baseURL, it becomes POST /api/auth/login
+        const { data: token } = await axios.post(
+            '/api/auth/login',
+            credentials,
+            { headers: { 'Content-Type': 'application/json' } }
+        );
 
-        // Decode token to get user info
+        localStorage.setItem('token', token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
         const decoded = jwtDecode(token);
-        // Example: If your token has sub = userId
-        const newUser = { id: decoded.sub, username: decoded.username };
-        setUser(newUser);
-    };
+        setUser({ username: decoded.sub });
+    }
 
-    const logout = () => {
-        // We don't have a real /logout endpoint, so just remove the token
-        Cookies.remove('token');
+    function logout() {
+        localStorage.removeItem('token');
+        delete axios.defaults.headers.common['Authorization'];
         setUser(null);
-    };
+    }
 
     return (
         <AuthContext.Provider value={{ user, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
-};
+}
 
-export const useAuth = () => useContext(AuthContext);
+export function useAuth() {
+    return useContext(AuthContext);
+}

@@ -34,8 +34,9 @@ public class JWTUtil {
     }
     // ✅ Modify generateToken to accept UserDetails
     public String generateToken(UserDetails userDetails) {
+        // Use userDetails.getUsername() as "sub"
         return Jwts.builder()
-                .setSubject(userDetails.getUsername())
+                .setSubject(userDetails.getUsername()) // sub = "faisal"
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -44,7 +45,11 @@ public class JWTUtil {
 
     // ✅ Extract Username from Token
     public String extractUsername(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parserBuilder().setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject(); // => "faisal"
     }
 
     // ✅ Validate Token
