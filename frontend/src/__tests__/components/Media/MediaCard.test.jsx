@@ -1,4 +1,3 @@
-// src/__tests__/components/Media/MediaCard.test.jsx
 import { render } from '@testing-library/react';
 import MediaCard from '../../../components/Media/MediaCard';
 

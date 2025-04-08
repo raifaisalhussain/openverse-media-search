@@ -1,25 +1,24 @@
-// src/components/Media/FiltersPanel.jsx
-import { useState, useEffect } from 'react';
+import {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 
-const FiltersPanel = ({ initialFilters, onFilterChange }) => {
+const FiltersPanel = ({initialFilters, onFilterChange}) => {
     const [filters, setFilters] = useState(initialFilters);
 
     const filterOptions = {
         mediaType: [
-            { value: '', label: 'All Media Types' },
-            { value: 'image', label: 'Images' },
-            { value: 'audio', label: 'Audio' }
+            {value: '', label: 'All Media Types'},
+            {value: 'image', label: 'Images'},
+            {value: 'audio', label: 'Audio'}
         ],
         license: [
-            { value: '', label: 'All Licenses' },
-            { value: 'cc0', label: 'CC0 Public Domain' },
-            { value: 'cc-by', label: 'CC BY' }
+            {value: '', label: 'All Licenses'},
+            {value: 'cc0', label: 'CC0 Public Domain'},
+            {value: 'cc-by', label: 'CC BY'}
         ],
         source: [
-            { value: '', label: 'All Sources' },
-            { value: 'flickr', label: 'Flickr' },
-            { value: 'wikimedia', label: 'Wikimedia' }
+            {value: '', label: 'All Sources'},
+            {value: 'flickr', label: 'Flickr'},
+            {value: 'wikimedia', label: 'Wikimedia'}
         ]
     };
 

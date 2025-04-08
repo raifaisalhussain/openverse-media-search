@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import {useQuery} from '@tanstack/react-query';
 import api from '../utils/http';
 
 const useMediaSearch = (query, filters) => {
@@ -6,7 +6,7 @@ const useMediaSearch = (query, filters) => {
         queryKey: ['search', query, filters],
         queryFn: async () => {
             try {
-                const { data } = await api.get('/api/media/search', {
+                const {data} = await api.get('/api/media/search', {
                     params: {
                         query,
                         mediaType: filters.mediaType || '',

@@ -16,7 +16,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class) // ✅ Handles mock initialization
+@ExtendWith(MockitoExtension.class)
 class MediaServiceTest {
 
     @Mock
@@ -30,14 +30,12 @@ class MediaServiceTest {
 
     @Test
     void testSearchMedia_AuthenticatedUser_SavesHistory() {
-        // 1. Mock authenticated user
         User user = new User();
         user.setId(1L);
         SecurityContextHolder.getContext().setAuthentication(
                 new MockAuthentication(user)
         );
 
-        // 2. Mock API response
         when(restTemplate.getForObject(anyString(), eq(Map.class)))
                 .thenReturn(Map.of(
                         "results", List.of(Map.of("title", "Test Image")),
@@ -45,35 +43,29 @@ class MediaServiceTest {
                         "page_size", 20
                 ));
 
-        // 3. Execute
         Map<String, Object> result = mediaService.searchMedia(
                 "nature", null, null, null, 1, user
         );
 
-        // 4. Verify
         assertTrue(result.containsKey("media"));
         verify(searchHistoryRepository, times(1)).save(any());
     }
 
     @Test
     void testSearchMedia_UnauthenticatedUser_NoHistorySaved() {
-        // 1. Mock API response
         when(restTemplate.getForObject(anyString(), eq(Map.class)))
                 .thenReturn(Map.of("results", List.of()));
 
-        // 2. Execute
         Map<String, Object> result = mediaService.searchMedia(
                 "nature", null, null, null, 1, null
         );
 
-        // 3. Verify
         assertTrue(result.containsKey("media"));
         verify(searchHistoryRepository, never()).save(any());
     }
 
     @Test
     void testSearchMediaNullUser() {
-        // for demonstration only
         MediaService mediaService = Mockito.mock(MediaService.class);
 
         Mockito.when(mediaService.searchMedia("test", "image", null, null, 1, null))

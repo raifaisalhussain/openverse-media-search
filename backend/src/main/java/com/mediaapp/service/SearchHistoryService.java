@@ -1,6 +1,5 @@
 package com.mediaapp.service;
 
-import com.mediaapp.exception.UserNotFoundException;
 import com.mediaapp.model.SearchHistory;
 import com.mediaapp.model.User;
 import com.mediaapp.repository.SearchHistoryRepository;
@@ -36,7 +35,7 @@ public class SearchHistoryService {
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isEmpty()) {
             logger.warn("No user found with username: {}", username);
-            return Collections.emptyList(); // ✅ Return empty list instead of null
+            return Collections.emptyList();
         }
 
         return searchHistoryRepository.findByUserId(userOpt.get().getId());

@@ -1,7 +1,6 @@
-// src/components/common/LoadingSpinner.jsx
 import PropTypes from 'prop-types';
 
-const LoadingSpinner = ({ size = 'medium', className = '' }) => {
+const LoadingSpinner = ({size = 'medium', className = ''}) => {
     const sizeConfig = {
         small: {
             dimensions: 'h-5 w-5',
@@ -17,7 +16,7 @@ const LoadingSpinner = ({ size = 'medium', className = '' }) => {
         }
     };
 
-    const { dimensions, border } = sizeConfig[size] || sizeConfig.medium;
+    const {dimensions, border} = sizeConfig[size] || sizeConfig.medium;
 
     return (
         <div

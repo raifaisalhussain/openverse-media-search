@@ -38,7 +38,6 @@ class MediaControllerTest {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(mediaController).build();
 
-        // Create a mock user
         mockUser = new User();
         mockUser.setId(1L);
         mockUser.setUsername("testuser");
@@ -47,7 +46,6 @@ class MediaControllerTest {
 
     @Test
     void testSearchMedia_Success() throws Exception {
-        // Mock response from service
         Map<String, Object> mockResponse = Map.of(
                 "totalResults", 1,
                 "media", Collections.singletonList(

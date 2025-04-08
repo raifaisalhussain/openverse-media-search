@@ -1,16 +1,15 @@
-// src/components/Layout/AppHeader.jsx
-import { Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import {Link} from 'react-router-dom';
+import {useAuth} from '../../contexts/AuthContext';
 
 const AppHeader = () => {
-    const { user, logout } = useAuth();
+    const {user, logout} = useAuth();
 
     return (
         <header className="bg-white shadow-sm">
             <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16 items-center">
                     <Link to="/" className="flex items-center">
-                        <img src="/logo.svg" alt="Logo" className="h-8 w-auto" />
+                        <img src="/logo.svg" alt="Logo" className="h-8 w-auto"/>
                         <span className="ml-2 text-xl font-bold text-gray-900">Openverse</span>
                     </Link>
 

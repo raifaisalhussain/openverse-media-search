@@ -29,10 +29,7 @@ public class MediaService {
 
     @Transactional
     public Map<String, Object> searchMedia(String query, String mediaType, String license, String source, int page, User user) {
-        // default to images if not specified
-        String endpoint = (mediaType != null && mediaType.equalsIgnoreCase("audio"))
-                ? OPENVERSE_API_BASE_URL + "/audio/"
-                : OPENVERSE_API_BASE_URL + "/images/";
+        String endpoint = (mediaType != null && mediaType.equalsIgnoreCase("audio")) ? OPENVERSE_API_BASE_URL + "/audio/" : OPENVERSE_API_BASE_URL + "/images/";
 
         StringBuilder apiUrl = new StringBuilder(endpoint + "?q=" + query + "&page=" + page);
         if (license != null && !license.isBlank()) apiUrl.append("&license=").append(license);
@@ -48,7 +45,6 @@ public class MediaService {
 
             List<Map<String, Object>> results = (List<Map<String, Object>>) apiResponse.get("results");
 
-            // format them for your React app
             List<Map<String, Object>> formatted = results.stream().map(r -> {
                 Map<String, Object> f = new HashMap<>();
                 f.put("title", r.get("title"));
@@ -61,7 +57,6 @@ public class MediaService {
                 return f;
             }).collect(Collectors.toList());
 
-            // saving user’s search automatically
             if (user != null && page == 1) {
                 logger.info("Saving search history for user: {}", user.getUsername());
                 SearchHistory history = new SearchHistory();
@@ -71,7 +66,6 @@ public class MediaService {
                 searchHistoryRepository.save(history);
             }
 
-            // pagination
             Number totalResultsNum = (Number) apiResponse.get("result_count");
             Number pageSizeNum = (Number) apiResponse.get("page_size");
 
@@ -79,12 +73,8 @@ public class MediaService {
             int pageSize = (pageSizeNum != null) ? pageSizeNum.intValue() : 20;
             int totalPages = (totalResults + pageSize - 1) / pageSize;
 
-            String nextPage = (page < totalPages)
-                    ? "/api/media/search?query=" + query + "&page=" + (page + 1)
-                    : null;
-            String prevPage = (page > 1)
-                    ? "/api/media/search?query=" + query + "&page=" + (page - 1)
-                    : null;
+            String nextPage = (page < totalPages) ? "/api/media/search?query=" + query + "&page=" + (page + 1) : null;
+            String prevPage = (page > 1) ? "/api/media/search?query=" + query + "&page=" + (page - 1) : null;
 
             Map<String, Object> response = new HashMap<>();
             response.put("totalResults", totalResults);

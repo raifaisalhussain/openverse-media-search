@@ -3,6 +3,7 @@ package com.mediaapp.controller;
 import com.mediaapp.model.User;
 import com.mediaapp.repository.UserRepository;
 import com.mediaapp.service.MediaService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,29 +27,23 @@ public class MediaController {
     private UserRepository userRepository;
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchMedia(
-            @RequestParam String query,
-            @RequestParam(required = false) String mediaType,
-            @RequestParam(required = false) String license,
-            @RequestParam(required = false) String source,
-            @RequestParam(defaultValue = "1") int page,
-            @AuthenticationPrincipal UserDetails userDetails
-    ) {
+    public ResponseEntity<?> searchMedia(@RequestParam String query, @RequestParam(required = false) String mediaType, @RequestParam(required = false) String license, @RequestParam(required = false) String source, @RequestParam(defaultValue = "1") int page, @AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request) {
         User user = null;
 
         if (userDetails != null) {
-            logger.info("Authenticated request by: {}", userDetails.getUsername());
             user = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
+        }
 
-            if (user == null) {
-                logger.warn("User not found in DB for username: {}", userDetails.getUsername());
+        if (user == null) {
+            Object sessionUser = request.getSession().getAttribute("user");
+            if (sessionUser instanceof User) {
+                user = (User) sessionUser;
             }
-        } else {
-            logger.warn("No authenticated user found in request.");
         }
 
         Map<String, Object> response = mediaService.searchMedia(query, mediaType, license, source, page, user);
         return ResponseEntity.ok(response);
     }
+
 
 }

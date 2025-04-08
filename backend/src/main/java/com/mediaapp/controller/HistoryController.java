@@ -6,6 +6,7 @@ import com.mediaapp.service.SearchHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -15,7 +16,6 @@ public class HistoryController {
     @Autowired
     private SearchHistoryService historyService;
 
-    // fetch search history by username
     @GetMapping("/user/{username}")
     public ResponseEntity<List<SearchHistory>> getUserHistory(@PathVariable String username) {
         List<SearchHistory> history = historyService.getUserHistoryByUsername(username);
@@ -25,7 +25,6 @@ public class HistoryController {
         return ResponseEntity.ok(history);
     }
 
-    // optionally still keep numeric if you want:
     @PostMapping("/save")
     public ResponseEntity<?> saveSearch(@RequestParam Long userId, @RequestParam String query) {
         historyService.saveSearch(userId, query);

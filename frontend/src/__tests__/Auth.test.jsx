@@ -1,4 +1,3 @@
-// src/__tests__/Auth.test.jsx
 import { render, screen, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '../contexts/AuthContext';

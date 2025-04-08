@@ -26,7 +26,7 @@ public class UserService {
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(User.Role.USER); // ✅ Fix: Assigning ENUM instead of String
+        user.setRole(User.Role.USER);
         userRepository.save(user);
         return ResponseEntity.ok("User registered successfully");
     }

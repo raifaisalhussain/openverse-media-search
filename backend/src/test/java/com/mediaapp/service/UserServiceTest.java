@@ -22,7 +22,7 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private PasswordEncoder passwordEncoder; // ✅ Add this mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserService userService;
@@ -34,19 +34,15 @@ class UserServiceTest {
 
     @Test
     void testRegisterUser_Success() {
-        // 1. Setup
         User user = new User();
         user.setUsername("testuser");
         user.setPassword("testpass");
 
-        // Mock repository responses
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
         when(passwordEncoder.encode("testpass")).thenReturn("hashed-password"); // ✅ Mock encode
 
-        // 2. Execute
         ResponseEntity<?> response = userService.register(user);
 
-        // 3. Verify
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("User registered successfully", response.getBody());
         verify(userRepository).save(any(User.class)); // Ensure user is saved

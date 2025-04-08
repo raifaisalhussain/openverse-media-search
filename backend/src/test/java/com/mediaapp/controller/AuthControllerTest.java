@@ -29,7 +29,7 @@ class AuthControllerTest {
     private UserService userService;
 
     @Mock
-    private JWTUtil jwtUtil;  // ✅ Replaced JwtTokenProvider with JWTUtil
+    private JWTUtil jwtUtil;
 
     @InjectMocks
     private AuthController authController;
