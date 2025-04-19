@@ -1,32 +1,56 @@
-version: '3.8'
-
 services:
-  postgres:
+  db:
     image: postgres:15
-    container_name: media-postgres
-    restart: always
+    container_name: media-db
     environment:
+      POSTGRES_DB: mediaapp
       POSTGRES_USER: mediauser
       POSTGRES_PASSWORD: test123
-      POSTGRES_DB: mediaapp
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U mediauser -d mediaapp" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  media-app:
-    image: raifaisalhussain/openverse-media-search:latest   # Replace with your Docker Hub image
-    container_name: media-backend
+  backend:
     depends_on:
-      - postgres
-    ports:
-      - "8080:8080"
+      db:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: media-backend
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mediaapp
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/mediaapp
       SPRING_DATASOURCE_USERNAME: mediauser
       SPRING_DATASOURCE_PASSWORD: test123
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: openverse-frontend
+    environment:
+      - REACT_APP_API_BASE_URL=
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
 
 volumes:
-  postgres-data:
+  pgdata:
+
+networks:
+  app-network:
+    driver: bridge

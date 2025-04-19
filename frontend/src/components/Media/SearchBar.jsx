@@ -18,7 +18,7 @@ export default function SearchBar({onSearch}) {
 
     async function handleFocus() {
         if (!user?.username) return;
-        setShowSuggestions(true); // open the dropdown
+        setShowSuggestions(true);
         setLoadingHistory(true);
 
         try {
@@ -45,14 +45,13 @@ export default function SearchBar({onSearch}) {
 
     function handleSubmit(e) {
         e.preventDefault();
-        onSearch({query, mediaType, license, source});
+        onSearch({ query, mediaType, license, source });
         setShowSuggestions(false);
     }
 
     return (
         <div className="relative" ref={containerRef}>
             <form onSubmit={handleSubmit} className="flex gap-2">
-                {/* Query input */}
                 <input
                     type="text"
                     value={query}
