@@ -2,6 +2,8 @@ package com.mediaapp.config;
 
 import com.mediaapp.security.GoogleOAuth2SuccessHandler;
 import com.mediaapp.security.JWTFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,6 +27,8 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
     private final UserDetailsService userDetailsService;
     private final JWTFilter jwtFilter;
     private final GoogleOAuth2SuccessHandler googleOAuth2SuccessHandler;
@@ -35,29 +39,16 @@ public class SecurityConfig {
         this.googleOAuth2SuccessHandler = googleOAuth2SuccessHandler;
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**", "/oauth2/**", "/login/**", "/api/media/search", "/api/logout").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl("http://localhost:3000", true)
-                        .successHandler(googleOAuth2SuccessHandler) // custom handler
-                )
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
+        logger.info("Configuring SecurityFilterChain");
 
+        return http.csrf(csrf -> csrf.disable()).cors(cors -> cors.configurationSource(corsConfigurationSource())).authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll().requestMatchers("/api/auth/**", "/oauth2/**", "/login/**", "/api/media/search", "/api/logout").permitAll().anyRequest().authenticated()).oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000", true).successHandler(googleOAuth2SuccessHandler)).sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)).addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).build();
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+        logger.info("Using BCryptPasswordEncoder as password encoder");
         return new BCryptPasswordEncoder();
     }
 
@@ -66,12 +57,15 @@ public class SecurityConfig {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
+
+        logger.info("AuthenticationManager initialized with DaoAuthenticationProvider");
         return new ProviderManager(List.of(authProvider));
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
+
         config.setAllowedOrigins(List.of("http://localhost:3000"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
@@ -79,7 +73,8 @@ public class SecurityConfig {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
+
+        logger.info("CORS configuration registered for http://localhost:3000");
         return source;
     }
-
 }

@@ -40,8 +40,7 @@ public class HistoryController {
             return ResponseEntity.ok(Collections.emptyList());
         } catch (Exception e) {
             logger.error("Error retrieving search history for user: {}", username, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to retrieve search history", "message", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Failed to retrieve search history", "message", e.getMessage()));
         }
     }
 
@@ -52,8 +51,7 @@ public class HistoryController {
             return ResponseEntity.ok("Search saved successfully!");
         } catch (Exception e) {
             logger.error("Error saving search history", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to save search", "message", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Failed to save search", "message", e.getMessage()));
         }
     }
 
@@ -64,8 +62,7 @@ public class HistoryController {
             return ResponseEntity.ok("Search deleted successfully!");
         } catch (Exception e) {
             logger.error("Error deleting search history", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to delete search", "message", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Failed to delete search", "message", e.getMessage()));
         }
     }
 }

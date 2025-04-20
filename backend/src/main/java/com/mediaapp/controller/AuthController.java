@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,43 +40,63 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
-        return userService.register(user);
+        try {
+            return userService.register(user);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Registration failed", "message", e.getMessage()));
+        }
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
-        String jwt = jwtUtil.generateToken(userDetails);
-        return ResponseEntity.ok(jwt);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+            String jwt = jwtUtil.generateToken(userDetails);
+            return ResponseEntity.ok(Map.of("token", jwt));
+
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid credentials", "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Login failed", "message", e.getMessage()));
+        }
     }
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("authenticated", false));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("authenticated", false, "error", "User not authenticated"));
         }
 
-        Map<String, Object> userInfo = new HashMap<>();
-        userInfo.put("authenticated", true);
-        userInfo.put("username", authentication.getName());
+        try {
+            Map<String, Object> userInfo = new HashMap<>();
+            userInfo.put("authenticated", true);
+            userInfo.put("username", authentication.getName());
 
-        if (authentication.getPrincipal() instanceof OAuth2User oauthUser) {
-            userInfo.put("email", oauthUser.getAttribute("email"));
-            userInfo.put("name", oauthUser.getAttribute("name"));
-            userInfo.put("picture", oauthUser.getAttribute("picture"));
-            userInfo.put("attributes", oauthUser.getAttributes());
+            if (authentication.getPrincipal() instanceof OAuth2User oauthUser) {
+                userInfo.put("email", oauthUser.getAttribute("email"));
+                userInfo.put("name", oauthUser.getAttribute("name"));
+                userInfo.put("picture", oauthUser.getAttribute("picture"));
+                userInfo.put("attributes", oauthUser.getAttributes());
+            }
+
+            return ResponseEntity.ok(userInfo);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Could not retrieve user info", "message", e.getMessage()));
         }
-
-        return ResponseEntity.ok(userInfo);
     }
 
     @PostMapping("/logout")
-    public void logout(HttpServletRequest request, HttpServletResponse response) throws ServletException {
-        request.logout();
-        request.getSession().invalidate();
-        SecurityContextHolder.clearContext();
-        response.setStatus(HttpServletResponse.SC_OK);
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            request.logout();
+            request.getSession().invalidate();
+            SecurityContextHolder.clearContext();
+            return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+        } catch (ServletException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Logout failed", "message", e.getMessage()));
+        }
     }
 }
