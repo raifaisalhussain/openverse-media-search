@@ -54,7 +54,7 @@ public class AuthController {
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
             String jwt = jwtUtil.generateToken(userDetails);
-            return ResponseEntity.ok(Map.of("token", jwt));
+            return ResponseEntity.ok(jwt);
 
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid credentials", "message", e.getMessage()));
@@ -66,7 +66,7 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("authenticated", false, "error", "User not authenticated"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("authenticated", false));
         }
 
         try {
@@ -74,12 +74,12 @@ public class AuthController {
             userInfo.put("authenticated", true);
             userInfo.put("username", authentication.getName());
 
-            if (authentication.getPrincipal() instanceof OAuth2User oauthUser) {
-                userInfo.put("email", oauthUser.getAttribute("email"));
-                userInfo.put("name", oauthUser.getAttribute("name"));
-                userInfo.put("picture", oauthUser.getAttribute("picture"));
-                userInfo.put("attributes", oauthUser.getAttributes());
-            }
+        if (authentication.getPrincipal() instanceof OAuth2User oauthUser) {
+            userInfo.put("email", oauthUser.getAttribute("email"));
+            userInfo.put("name", oauthUser.getAttribute("name"));
+            userInfo.put("picture", oauthUser.getAttribute("picture"));
+            userInfo.put("attributes", oauthUser.getAttributes());
+        }
 
             return ResponseEntity.ok(userInfo);
 
@@ -89,14 +89,10 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            request.logout();
-            request.getSession().invalidate();
-            SecurityContextHolder.clearContext();
-            return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
-        } catch (ServletException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Logout failed", "message", e.getMessage()));
-        }
+    public void logout(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+        request.logout();
+        request.getSession().invalidate();
+        SecurityContextHolder.clearContext();
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 }

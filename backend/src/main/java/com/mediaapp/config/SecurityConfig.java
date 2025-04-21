@@ -43,7 +43,21 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         logger.info("Configuring SecurityFilterChain");
 
-        return http.csrf(csrf -> csrf.disable()).cors(cors -> cors.configurationSource(corsConfigurationSource())).authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll().requestMatchers("/api/auth/**", "/oauth2/**", "/login/**", "/api/media/search", "/api/logout").permitAll().anyRequest().authenticated()).oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000", true).successHandler(googleOAuth2SuccessHandler)).sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)).addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).build();
+        return http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/oauth2/**", "/login/**", "/api/media/search", "/api/logout").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .defaultSuccessUrl("http://localhost:3000", true)
+                        .successHandler(googleOAuth2SuccessHandler) // custom handler
+                )
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean

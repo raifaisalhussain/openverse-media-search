@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.*;
-import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
 @Configuration
@@ -26,16 +25,14 @@ public class AppConfig {
                 }
 
                 public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                    // Trust all
                 }
 
                 public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                    // Trust all
                 }
             }};
 
             SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, trustAllCerts, new SecureRandom());
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
 
             HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
             HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);

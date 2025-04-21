@@ -1,0 +1,47 @@
+[33mcommit 25b5fedcb51a81ec133a743b47e09fedb54f81cf[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Faisal Hussain <raifaisalhussain@gmail.com>
+Date:   Sun Apr 20 05:13:18 2025 +0100
+
+    Backend JUnit Testing and Error Handling
+
+[1mdiff --git a/app.jar b/app.jar[m
+[1mindex a5d601a..decd5ad 100644[m
+Binary files a/app.jar and b/app.jar differ
+[1mdiff --git a/app.log b/app.log[m
+[1mdeleted file mode 100644[m
+[1mindex 199383b..0000000[m
+[1m--- a/app.log[m
+[1m+++ /dev/null[m
+[36m@@ -1,598 +0,0 @@[m
+[31m-2025-04-19T13:47:18.753+01:00  INFO 7484 --- [openverse-media-search] [main] c.m.controller.AuthControllerTest        : Starting AuthControllerTest using Java 21.0.6 with PID 7484 (started by MT in D:\MS\Software Engineering\openverse-media-search)[m
+[31m-2025-04-19T13:47:18.762+01:00 DEBUG 7484 --- [openverse-media-search] [main] c.m.controller.AuthControllerTest        : Running with Spring Boot v3.4.3, Spring v6.2.3[m
+[31m-2025-04-19T13:47:18.764+01:00  INFO 7484 --- [openverse-media-search] [main] c.m.controller.AuthControllerTest        : No active profile set, falling back to 1 default profile: "default"[m
+[31m-2025-04-19T13:47:20.331+01:00  WARN 7484 --- [openverse-media-search] [main] o.s.w.c.s.GenericWebApplicationContext   : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'authController': Unsatisfied dependency expressed through field 'userService': No qualifying bean of type 'com.mediaapp.service.UserService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}[m
+[31m-2025-04-19T13:47:20.350+01:00  INFO 7484 --- [openverse-media-search] [main] .s.b.a.l.ConditionEvaluationReportLogger : [m
+[31m-[m
+[31m-Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.[m
+[31m-2025-04-19T13:47:20.404+01:00 ERROR 7484 --- [openverse-media-search] [main] o.s.b.d.LoggingFailureAnalysisReporter   : [m
+[31m-[m
+[31m-***************************[m
+[31m-APPLICATION FAILED TO START[m
+[31m-***************************[m
+[31m-[m
+[31m-Description:[m
+[31m-[m
+[31m-Field userService in com.mediaapp.controller.AuthController required a bean of type 'com.mediaapp.service.UserService' that could not be found.[m
+[31m-[m
+[31m-The injection point has the following annotations:[m
+[31m-	- @org.springframework.beans.factory.annotation.Autowired(required=true)[m
+[31m-[m
+[31m-[m
+[31m-Action:[m
+[31m-[m
+[31m-Consider defining a bean of type 'com.mediaapp.service.UserService' in your configuration.[m
+[31m-[m
+[31m-2025-04-19T13:47:20.415+01:00  WARN 7484 --- [openverse-media-search] [main] o.s.test.context.TestContextManager      : Caught exception while allowing TestExecutionListener [org.springframework.test.context.support.DependencyInjectionTestExecutionListener] to prepare test instance [com.mediaapp.controller.AuthControllerTest@4ff66917][m
+[31m-[m
+[31m-java.lang.IllegalStateException: Failed to load ApplicationContext for [WebMergedContextConfiguration@3b3056a6 testClass = com.mediaapp.controller.AuthControllerTest, locations = [], classes = [com.mediaapp.MediaAppApplication], contextInitializerClasses = [], activeProfiles = [], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTestContextBootstrapper=true"], contextCustomizers = [[ImportsContextCustomizer@6d4a05f7 key = [org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration, org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration, org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration, org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration, org.springframework.boot.autoconfigure.hateoas.HypermediaAutoConfiguration, org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration, org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration, com.mediaapp.controller.AuthController, org.springframework.boot.test.autoconfigure.web.reactive.WebTestClientAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration, org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcSecurityConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebDriverAutoConfiguration, org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration, org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration, org.springframework.boot.autoconfigure.jsonb.JsonbAutoConfiguration, org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration, org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration, org.springframework.boot.autoconfigure.mustache.MustacheAutoConfiguration]], org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@198d6542, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@5be49b60, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@6bf08014, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@1fb19a0, org.springframework.boot.test.autoconfigure.OverrideAutoConfigurationContextCustomizerFactory$DisableAutoConfigurationContextCustomizer@418c5a9c, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.filter.TypeExcludeFiltersContextCustomizer@8c484cd3, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@8551ee9, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@5b367418, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@49614455], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null][m
+[31m-	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:180) ~[spring-test-6.2.3.jar:6.2.3][m
+[31m-	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130) ~[spring-test-6.2.3.jar:6.2.3][m
+[31m-	at org.springframework.test.context.support.DependencyInjectionTestExecutionListener.injectDependencies(DependencyInjectionTestExecutionListener.java:155) ~[spring-test-6.2.3.jar:6.2.3][m
+[31m-	at org.springframework.test.context.support.DependencyInjectionTestExecutionListener.prepareTestInstance(DependencyInjectionTestExecution
