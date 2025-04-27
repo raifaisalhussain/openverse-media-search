@@ -1,0 +1,27 @@
+name: Backend Testing CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build and Run Backend Tests
+        working-directory: ./backend
+        run: |
+          echo "Running Maven clean verify (test + compile)..."
+          mvn clean verify
