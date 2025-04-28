@@ -22,5 +22,5 @@ jobs:
 
       - name: Build and Run Backend Tests
         run: |
-          echo "Running Maven clean verify (test + compile)..."
-          mvn clean verify -pl backend -am
+          echo "Running Maven clean verify (test + compile) at root"
+          mvn clean verify
