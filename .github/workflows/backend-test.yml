@@ -21,7 +21,6 @@ jobs:
           java-version: '21'
 
       - name: Build and Run Backend Tests
-        working-directory: ./backend
         run: |
           echo "Running Maven clean verify (test + compile)..."
-          mvn clean verify
+          mvn clean verify -pl backend -am
